@@ -35,8 +35,9 @@ export default function ActivityDonut({ sessions }: Props) {
         <h3 className="text-white font-semibold">Activity Split</h3>
         <p className="text-slate-400 text-xs">This month</p>
       </div>
-      <div className="flex items-center gap-4">
-        <ResponsiveContainer width={140} height={140}>
+      <div className="flex flex-col sm:flex-row items-center gap-4">
+        <div className="w-36 h-36 shrink-0">
+        <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
@@ -53,7 +54,8 @@ export default function ActivityDonut({ sessions }: Props) {
             <Tooltip content={<CustomTooltip />} />
           </PieChart>
         </ResponsiveContainer>
-        <div className="flex-1 space-y-1.5">
+        </div>
+        <div className="flex-1 space-y-1.5 w-full">
           {data.map(d => {
             const color = ACTIVITY_COLORS[d.activity as keyof typeof ACTIVITY_COLORS] || '#6b7280'
             const label = ACTIVITY_LABELS[d.activity as keyof typeof ACTIVITY_LABELS] || d.activity

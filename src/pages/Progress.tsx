@@ -18,7 +18,7 @@ export default function Progress() {
   return (
     <div className="space-y-6">
       {/* Lifetime stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: 'Total Sessions', value: totalSessions.toString(), icon: Trophy, color: 'purple' as const },
           { label: 'Total Volume', value: formatDuration(totalMinutes), icon: Clock, color: 'blue' as const },
@@ -46,7 +46,7 @@ export default function Progress() {
       <ProgressLineChart sessions={sessions} />
 
       {/* Monthly comparison + consistency */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <MonthlyComparisonChart sessions={sessions} />
         <ConsistencyChart sessions={sessions} />
       </div>
@@ -58,7 +58,7 @@ export default function Progress() {
             <Trophy className="w-5 h-5 text-yellow-400" />
             <h3 className="text-white font-semibold">Personal Records</h3>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-slate-800 rounded-lg p-4">
               <p className="text-slate-400 text-xs mb-1">Longest Session</p>
               <p className="text-white font-bold text-xl">{formatDuration(prs.longestSession.duration)}</p>

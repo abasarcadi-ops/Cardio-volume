@@ -70,7 +70,7 @@ export default function HeatmapCalendar({ sessions }: Props) {
                 return (
                   <div
                     key={di}
-                    className="w-2.5 h-2.5 rounded-sm transition-colors"
+                    className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-sm transition-colors"
                     style={{ backgroundColor: color }}
                     title={date ? `${date}: ${minutes}m` : ''}
                   />

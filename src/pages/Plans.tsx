@@ -117,7 +117,7 @@ function PlanBuilderModal({ onClose }: { onClose: () => void }) {
           </div>
           <div className="space-y-2 max-h-48 overflow-y-auto">
             {sessions.map((s, i) => (
-              <div key={i} className="grid grid-cols-5 gap-2 bg-slate-800 rounded-lg p-2.5 items-center">
+              <div key={i} className="grid grid-cols-2 sm:grid-cols-5 gap-2 bg-slate-800 rounded-lg p-2.5 items-center">
                 <select
                   value={s.weekNumber}
                   onChange={e => updateSession(i, { weekNumber: parseInt(e.target.value) })}
@@ -213,7 +213,7 @@ export default function Plans() {
       {activePlans.length > 0 && (
         <div>
           <h2 className="text-white font-semibold mb-3">Active</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {activePlans.map(p => <TrainingPlanCard key={p.id} plan={p} />)}
           </div>
         </div>
@@ -223,7 +223,7 @@ export default function Plans() {
       {inactivePlans.length > 0 && (
         <div>
           <h2 className="text-white font-semibold mb-3">{activePlans.length > 0 ? 'Other Plans' : 'Your Plans'}</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {inactivePlans.map(p => <TrainingPlanCard key={p.id} plan={p} />)}
           </div>
         </div>

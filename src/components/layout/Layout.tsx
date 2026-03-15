@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Header from './Header'
+import BottomNav from './BottomNav'
 import LogSessionModal from '../logging/LogSessionModal'
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
@@ -19,13 +20,16 @@ export default function Layout() {
 
   return (
     <div className="flex h-screen bg-slate-950 text-white overflow-hidden">
-      <Sidebar />
+      <div className="hidden md:flex shrink-0">
+        <Sidebar />
+      </div>
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header title={page.title} subtitle={page.subtitle} onLogSession={() => setShowLog(true)} />
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6">
           <Outlet />
         </main>
       </div>
+      <BottomNav />
       {showLog && <LogSessionModal onClose={() => setShowLog(false)} />}
     </div>
   )

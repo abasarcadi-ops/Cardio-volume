@@ -198,7 +198,7 @@ export default function AIPlan() {
         <div>
           <h2 className="text-white font-bold text-2xl mb-1">What's your goal?</h2>
           <p className="text-slate-400 text-sm mb-6">Your AI coach will tailor the plan to your objectives</p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {GOALS.map(g => (
               <button
                 key={g.id}
@@ -247,7 +247,7 @@ export default function AIPlan() {
         <div>
           <h2 className="text-white font-bold text-2xl mb-1">Preferred activities</h2>
           <p className="text-slate-400 text-sm mb-6">Select one or more activities to include in your plan</p>
-          <div className="grid grid-cols-4 gap-2 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
             {ACTIVITIES.map(a => {
               const selected = params.preferredActivities.includes(a)
               const color = ACTIVITY_COLORS[a]

@@ -42,8 +42,8 @@ export default function Log() {
   return (
     <div className="space-y-5">
       {/* Filters */}
-      <div className="flex gap-3">
-        <div className="relative flex-1 max-w-xs">
+      <div className="flex flex-wrap gap-3">
+        <div className="relative flex-1 min-w-48">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
           <input
             type="text"
@@ -59,7 +59,7 @@ export default function Log() {
             <button
               key={a}
               onClick={() => setFilter(a)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
                 filter === a ? 'bg-blue-600 text-white' : 'bg-slate-900 border border-slate-700 text-slate-400 hover:text-white'
               }`}
             >

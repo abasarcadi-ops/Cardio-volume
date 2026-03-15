@@ -47,7 +47,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Stat cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           label="Today"
           value={todayVol > 0 ? formatDuration(todayVol) : '—'}
@@ -100,16 +100,16 @@ export default function Dashboard() {
       <VolumeAreaChart sessions={sessions} days={30} />
 
       {/* Row 2: Weekly bar + Donut */}
-      <div className="grid grid-cols-3 gap-6">
-        <div className="col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
           <WeeklyBarChart sessions={sessions} weeks={12} />
         </div>
         <ActivityDonut sessions={thisMonthSessions} />
       </div>
 
       {/* Row 3: Heatmap + Active plan */}
-      <div className="grid grid-cols-3 gap-6">
-        <div className="col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
           <HeatmapCalendar sessions={sessions} />
         </div>
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
