@@ -1,50 +1,53 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 import { WorkoutSession } from '../types'
-import { generateSeedData } from '../lib/seedData'
+import { getSupabase } from '../lib/supabase'
+import { fetchSessions, insertSession, updateSessionDB, deleteSessionDB } from '../lib/db'
 
 interface SessionsState {
   sessions: WorkoutSession[]
-  addSession: (session: Omit<WorkoutSession, 'id'>) => void
-  updateSession: (id: string, updates: Partial<WorkoutSession>) => void
-  deleteSession: (id: string) => void
-  hydrated: boolean
+  loading: boolean
+  loadFromDB: (userId: string) => Promise<void>
+  clearAll: () => void
+  addSession: (session: Omit<WorkoutSession, 'id'>) => Promise<void>
+  updateSession: (id: string, updates: Partial<WorkoutSession>) => Promise<void>
+  deleteSession: (id: string) => Promise<void>
 }
 
-function generateId(): string {
-  return Math.random().toString(36).substr(2, 9)
-}
+export const useSessionsStore = create<SessionsState>()((set) => ({
+  sessions: [],
+  loading: false,
 
-export const useSessionsStore = create<SessionsState>()(
-  persist(
-    (set, get) => ({
-      sessions: [],
-      hydrated: false,
-      addSession: (session) => {
-        set(state => ({
-          sessions: [...state.sessions, { ...session, id: generateId() }],
-        }))
-      },
-      updateSession: (id, updates) => {
-        set(state => ({
-          sessions: state.sessions.map(s => s.id === id ? { ...s, ...updates } : s),
-        }))
-      },
-      deleteSession: (id) => {
-        set(state => ({ sessions: state.sessions.filter(s => s.id !== id) }))
-      },
-    }),
-    {
-      name: 'cardio-sessions',
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          state.hydrated = true
-          // Seed data if empty
-          if (state.sessions.length === 0) {
-            state.sessions = generateSeedData()
-          }
-        }
-      },
+  loadFromDB: async (userId) => {
+    set({ loading: true })
+    try {
+      const sb = getSupabase()!
+      const sessions = await fetchSessions(sb, userId)
+      set({ sessions })
+    } finally {
+      set({ loading: false })
     }
-  )
-)
+  },
+
+  clearAll: () => set({ sessions: [], loading: false }),
+
+  addSession: async (sessionData) => {
+    const sb = getSupabase()!
+    const { data: { user } } = await sb.auth.getUser()
+    const id = await insertSession(sb, sessionData, user!.id)
+    set(state => ({ sessions: [{ ...sessionData, id }, ...state.sessions] }))
+  },
+
+  updateSession: async (id, updates) => {
+    set(state => ({
+      sessions: state.sessions.map(s => s.id === id ? { ...s, ...updates } : s),
+    }))
+    const sb = getSupabase()!
+    await updateSessionDB(sb, id, updates)
+  },
+
+  deleteSession: async (id) => {
+    set(state => ({ sessions: state.sessions.filter(s => s.id !== id) }))
+    const sb = getSupabase()!
+    await deleteSessionDB(sb, id)
+  },
+}))
