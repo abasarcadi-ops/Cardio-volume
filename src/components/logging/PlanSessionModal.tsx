@@ -1,13 +1,11 @@
 import { useState } from 'react'
 import Modal from '../ui/Modal'
 import { useSessionsStore } from '../../store/sessionsStore'
-import { ActivityType, ACTIVITY_COLORS, ACTIVITY_LABELS } from '../../types'
+import { ActivityType, ACTIVITY_COLORS, ACTIVITY_LABELS, TrainingZone, TRAINING_ZONE_LABELS, TRAINING_ZONE_COLORS } from '../../types'
+import ActivityIcon from '../ui/ActivityIcon'
 
 const ACTIVITIES: ActivityType[] = ['running', 'cycling', 'rowing', 'swimming', 'elliptical', 'hiit', 'walking', 'custom']
-const ACTIVITY_ICONS: Record<ActivityType, string> = {
-  running: '🏃', cycling: '🚴', rowing: '🚣', swimming: '🏊',
-  elliptical: '⚡', hiit: '🔥', walking: '🚶', custom: '⭐',
-}
+const ZONES: TrainingZone[] = ['recovery', 'zone2', 'tempo', 'threshold', 'vo2max', 'hiit', 'long_run', 'compromised']
 
 interface Props {
   date: string
@@ -21,6 +19,7 @@ export default function PlanSessionModal({ date, onClose }: Props) {
   const [duration, setDuration] = useState(45)
   const [distance, setDistance] = useState('')
   const [notes, setNotes] = useState('')
+  const [zone, setZone] = useState<TrainingZone | undefined>()
 
   const displayDate = new Date(date + 'T12:00:00').toLocaleDateString('en', {
     weekday: 'long', month: 'long', day: 'numeric',
@@ -36,6 +35,7 @@ export default function PlanSessionModal({ date, onClose }: Props) {
       perceivedEffort: 3,
       notes: notes || undefined,
       status: 'planned',
+      trainingZone: zone,
     })
     onClose()
   }
@@ -62,7 +62,7 @@ export default function PlanSessionModal({ date, onClose }: Props) {
                   }`}
                   style={selected ? { borderColor: color, backgroundColor: `${color}15`, color } : {}}
                 >
-                  <span className="text-xl">{ACTIVITY_ICONS[a]}</span>
+                  <ActivityIcon activity={a} size={20} />
                   {ACTIVITY_LABELS[a]}
                 </button>
               )
@@ -86,6 +86,30 @@ export default function PlanSessionModal({ date, onClose }: Props) {
           />
           <div className="flex justify-between text-xs text-slate-500 mt-0.5">
             <span>5m</span><span>4h</span>
+          </div>
+        </div>
+
+        {/* Training Zone */}
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">Training Zone — optional</label>
+          <div className="flex flex-wrap gap-2">
+            {ZONES.map(z => {
+              const color = TRAINING_ZONE_COLORS[z]
+              const selected = zone === z
+              return (
+                <button
+                  key={z}
+                  type="button"
+                  onClick={() => setZone(selected ? undefined : z)}
+                  className="px-2.5 py-1 rounded-full text-xs font-medium border transition-all"
+                  style={selected
+                    ? { backgroundColor: `${color}25`, borderColor: color, color }
+                    : { borderColor: '#334155', color: '#64748b' }}
+                >
+                  {TRAINING_ZONE_LABELS[z]}
+                </button>
+              )
+            })}
           </div>
         </div>
 

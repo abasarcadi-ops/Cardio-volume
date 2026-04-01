@@ -17,6 +17,7 @@ function rowToSession(row: Record<string, unknown>): WorkoutSession {
     notes: row.notes as string | undefined,
     customName: row.custom_name as string | undefined,
     status: (row.status as 'planned' | 'completed') ?? 'completed',
+    trainingZone: row.training_zone as WorkoutSession['trainingZone'] ?? undefined,
   }
 }
 
@@ -50,6 +51,7 @@ export async function insertSession(
     notes: session.notes ?? null,
     custom_name: session.customName ?? null,
     status: session.status,
+    training_zone: session.trainingZone ?? null,
   })
   if (error) throw error
   return id
@@ -72,6 +74,7 @@ export async function updateSessionDB(
   if (updates.notes !== undefined) row.notes = updates.notes
   if (updates.customName !== undefined) row.custom_name = updates.customName
   if (updates.status !== undefined) row.status = updates.status
+  if (updates.trainingZone !== undefined) row.training_zone = updates.trainingZone
   const { error } = await sb.from('workout_sessions').update(row).eq('id', id)
   if (error) throw error
 }

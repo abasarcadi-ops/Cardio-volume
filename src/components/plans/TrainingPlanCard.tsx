@@ -1,6 +1,7 @@
 import { Play, Pause, Trash2, Sparkles, Calendar } from 'lucide-react'
-import { TrainingPlan } from '../../types'
+import { TrainingPlan, ACTIVITY_COLORS, ACTIVITY_LABELS, TRAINING_ZONE_COLORS, TRAINING_ZONE_SHORT } from '../../types'
 import { usePlansStore } from '../../store/plansStore'
+import ActivityIcon from '../ui/ActivityIcon'
 
 interface Props {
   plan: TrainingPlan
@@ -51,6 +52,29 @@ export default function TrainingPlanCard({ plan }: Props) {
         <span>{sessionsPerWeek} sessions/wk</span>
         <span>{plan.sessions.length} total sessions</span>
       </div>
+
+      {/* Week 1 preview */}
+      {sessionsPerWeek > 0 && (
+        <div className="mt-4 space-y-1">
+          <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-1.5">Week 1</p>
+          {plan.sessions.filter(s => s.weekNumber === 1).map((s, i) => {
+            const color = ACTIVITY_COLORS[s.activity]
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+            return (
+              <div key={i} className="flex items-center gap-2 text-xs">
+                <span className="text-slate-600 w-7 shrink-0">{days[s.dayOfWeek]}</span>
+                <span style={{ color }}><ActivityIcon activity={s.activity} size={12} /></span>
+                <span className="text-slate-400 flex-1 truncate">{ACTIVITY_LABELS[s.activity]} · {s.targetDuration}m</span>
+                {s.trainingZone && (
+                  <span className="font-semibold shrink-0" style={{ color: TRAINING_ZONE_COLORS[s.trainingZone] }}>
+                    {TRAINING_ZONE_SHORT[s.trainingZone]}
+                  </span>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       <div className="flex items-center gap-2 mt-4">
         {plan.isActive ? (

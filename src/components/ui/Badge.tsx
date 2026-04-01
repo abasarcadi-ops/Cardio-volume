@@ -1,4 +1,4 @@
-import { ACTIVITY_COLORS, ACTIVITY_LABELS, ActivityType, EFFORT_COLORS, EFFORT_LABELS } from '../../types'
+import { ACTIVITY_COLORS, ACTIVITY_LABELS, ActivityType, EFFORT_COLORS, EFFORT_LABELS, TrainingZone, TRAINING_ZONE_COLORS, TRAINING_ZONE_LABELS } from '../../types'
 
 export function ActivityBadge({ activity }: { activity: ActivityType }) {
   const color = ACTIVITY_COLORS[activity]
@@ -22,6 +22,20 @@ export function EffortBadge({ effort }: { effort: number }) {
       className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
       style={{ backgroundColor: `${color}20`, color }}
     >
+      {label}
+    </span>
+  )
+}
+
+export function TrainingZoneBadge({ zone }: { zone: TrainingZone }) {
+  const color = TRAINING_ZONE_COLORS[zone]
+  const label = TRAINING_ZONE_LABELS[zone]
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+      style={{ backgroundColor: `${color}20`, color }}
+    >
+      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
       {label}
     </span>
   )

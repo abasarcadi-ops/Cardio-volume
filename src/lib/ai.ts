@@ -1,7 +1,18 @@
-import { AIPlanParams, TrainingPlan, PlannedSession, ActivityType, IntensityLevel } from '../types'
+import { AIPlanParams, TrainingPlan, PlannedSession, ActivityType, IntensityLevel, TrainingZone } from '../types'
 
 function generateId(): string {
   return Math.random().toString(36).substr(2, 9)
+}
+
+function getTrainingZone(activity: ActivityType, intensity: IntensityLevel, isLong: boolean): TrainingZone {
+  if (isLong) return 'long_run'
+  if (activity === 'hiit') return 'hiit'
+  switch (intensity) {
+    case 'easy':     return 'zone2'
+    case 'moderate': return 'tempo'
+    case 'hard':     return 'threshold'
+    case 'race':     return 'vo2max'
+  }
 }
 
 function buildMockPlan(params: AIPlanParams): TrainingPlan {
@@ -27,14 +38,17 @@ function buildMockPlan(params: AIPlanParams): TrainingPlan {
       const progressionFactor = 1 + (w - 1) * 0.07
       const duration = Math.round(baseDuration * progressionFactor)
       const isLong = idx === activeDays.length - 1
+      const sessionIntensity: IntensityLevel = isLong ? 'easy' : intensity
+      const zone = getTrainingZone(activity, sessionIntensity, isLong)
 
       sessions.push({
         weekNumber: w,
         dayOfWeek: day,
         activity,
         targetDuration: isLong ? Math.round(duration * 1.4) : duration,
-        intensity: isLong ? 'easy' : intensity,
-        description: buildSessionDescription(activity, isLong ? 'easy' : intensity, isLong),
+        intensity: sessionIntensity,
+        description: buildSessionDescription(activity, sessionIntensity, isLong),
+        trainingZone: zone,
       })
     })
   }
@@ -89,7 +103,17 @@ User profile:
 - Preferred activities: ${params.preferredActivities.join(', ')}
 - Limitations: ${params.limitations || 'none'}
 
-Return ONLY valid JSON matching this TypeScript interface (no markdown, no explanation):
+Training zone definitions (assign one to each session):
+- "recovery"    — Very easy active recovery, Zone 1, <60% max HR
+- "zone2"       — Aerobic base building, fat burning, Zone 2, conversational pace
+- "tempo"       — Comfortably hard, lactate threshold, Zone 3, 20-40min efforts
+- "threshold"   — Threshold intervals, Zone 4, sustained hard effort
+- "vo2max"      — VO2 max intervals, Zone 5, short hard efforts with rest
+- "hiit"        — High intensity intervals, anaerobic work
+- "long_run"    — Long slow distance, easy pace for extended duration
+- "compromised" — Compromised running / brick workouts (run immediately after bike)
+
+Return ONLY valid JSON (no markdown, no explanation):
 {
   "name": string,
   "description": string,
@@ -100,6 +124,7 @@ Return ONLY valid JSON matching this TypeScript interface (no markdown, no expla
     "targetDuration": number (minutes),
     "targetDistance": number (optional, km),
     "intensity": "easy"|"moderate"|"hard"|"race",
+    "trainingZone": "recovery"|"zone2"|"tempo"|"threshold"|"vo2max"|"hiit"|"long_run"|"compromised",
     "description": string
   }>
 }`

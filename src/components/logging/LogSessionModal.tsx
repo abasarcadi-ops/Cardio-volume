@@ -3,19 +3,9 @@ import Modal from '../ui/Modal'
 import { useSessionsStore } from '../../store/sessionsStore'
 import { ActivityType, ACTIVITY_COLORS, ACTIVITY_LABELS, EFFORT_LABELS } from '../../types'
 import { getTodayStr } from '../../lib/metrics'
+import ActivityIcon from '../ui/ActivityIcon'
 
 const ACTIVITIES: ActivityType[] = ['running', 'cycling', 'rowing', 'swimming', 'elliptical', 'hiit', 'walking', 'custom']
-
-const ACTIVITY_ICONS: Record<ActivityType, string> = {
-  running: '🏃',
-  cycling: '🚴',
-  rowing: '🚣',
-  swimming: '🏊',
-  elliptical: '⚡',
-  hiit: '🔥',
-  walking: '🚶',
-  custom: '⭐',
-}
 
 interface Props {
   onClose: () => void
@@ -73,7 +63,7 @@ export default function LogSessionModal({ onClose }: Props) {
                   }`}
                   style={selected ? { borderColor: color, backgroundColor: `${color}15`, color } : {}}
                 >
-                  <span className="text-xl">{ACTIVITY_ICONS[a]}</span>
+                  <ActivityIcon activity={a} size={20} />
                   {ACTIVITY_LABELS[a]}
                 </button>
               )

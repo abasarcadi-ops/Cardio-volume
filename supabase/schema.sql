@@ -18,6 +18,7 @@ CREATE TABLE workout_sessions (
   notes           TEXT,
   custom_name     TEXT,
   status          TEXT NOT NULL DEFAULT 'completed' CHECK (status IN ('planned', 'completed')),
+  training_zone   TEXT,
   created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -89,3 +90,6 @@ CREATE POLICY "users_own_settings"
 --   ADD COLUMN IF NOT EXISTS race_date DATE,
 --   ADD COLUMN IF NOT EXISTS injuries TEXT,
 --   ADD COLUMN IF NOT EXISTS onboarding_complete BOOLEAN NOT NULL DEFAULT FALSE;
+--
+-- ALTER TABLE workout_sessions
+--   ADD COLUMN IF NOT EXISTS training_zone TEXT;

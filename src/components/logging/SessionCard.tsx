@@ -1,19 +1,9 @@
 import { Trash2, Clock, Ruler, Flame, Heart } from 'lucide-react'
-import { WorkoutSession } from '../../types'
+import { WorkoutSession, ACTIVITY_COLORS } from '../../types'
 import { ActivityBadge, EffortBadge } from '../ui/Badge'
 import { formatDuration } from '../../lib/metrics'
 import { useSessionsStore } from '../../store/sessionsStore'
-
-const ACTIVITY_ICONS: Record<string, string> = {
-  running: '🏃',
-  cycling: '🚴',
-  rowing: '🚣',
-  swimming: '🏊',
-  elliptical: '⚡',
-  hiit: '🔥',
-  walking: '🚶',
-  custom: '⭐',
-}
+import ActivityIcon from '../ui/ActivityIcon'
 
 interface Props {
   session: WorkoutSession
@@ -30,7 +20,9 @@ export default function SessionCard({ session }: Props) {
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center gap-4 hover:border-slate-700 transition-colors group">
-      <div className="text-2xl w-10 text-center shrink-0">{ACTIVITY_ICONS[session.activity]}</div>
+      <div className="w-10 flex items-center justify-center shrink-0" style={{ color: ACTIVITY_COLORS[session.activity] }}>
+        <ActivityIcon activity={session.activity} size={24} />
+      </div>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">

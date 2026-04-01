@@ -1,13 +1,10 @@
 import { useState } from 'react'
 import { ChevronRight, ChevronLeft, Activity, Check } from 'lucide-react'
 import { useSettingsStore } from '../store/settingsStore'
-import { ActivityType, FitnessLevel, ACTIVITY_LABELS } from '../types'
+import { ActivityType, FitnessLevel, ACTIVITY_LABELS, ACTIVITY_COLORS } from '../types'
+import ActivityIcon from '../components/ui/ActivityIcon'
 
 const ACTIVITIES: ActivityType[] = ['running', 'cycling', 'rowing', 'swimming', 'elliptical', 'hiit', 'walking', 'custom']
-const ACTIVITY_ICONS: Record<ActivityType, string> = {
-  running: '🏃', cycling: '🚴', rowing: '🚣', swimming: '🏊',
-  elliptical: '⚡', hiit: '🔥', walking: '🚶', custom: '⭐',
-}
 const RACE_TYPES = ['5K', '10K', 'Half Marathon', 'Marathon', 'Triathlon', 'Duathlon', 'Other']
 const GOALS = [
   { value: 'general_fitness', label: 'General Fitness', description: 'Stay active and healthy' },
@@ -202,7 +199,7 @@ export default function OnboardingPage() {
                             : 'bg-slate-700 text-slate-400 hover:text-white border border-transparent'
                         }`}
                       >
-                        <span>{ACTIVITY_ICONS[a]}</span>
+                        <ActivityIcon activity={a} size={16} className={selected ? 'text-blue-400' : 'text-slate-400'} />
                         {ACTIVITY_LABELS[a]}
                         {selected && <Check size={14} className="ml-auto" />}
                       </button>

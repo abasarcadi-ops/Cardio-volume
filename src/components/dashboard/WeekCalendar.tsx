@@ -1,11 +1,7 @@
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, Plus, Check } from 'lucide-react'
-import { WorkoutSession, ACTIVITY_COLORS, ACTIVITY_LABELS } from '../../types'
-
-const ACTIVITY_ICONS: Record<string, string> = {
-  running: '🏃', cycling: '🚴', rowing: '🚣', swimming: '🏊',
-  elliptical: '⚡', hiit: '🔥', walking: '🚶', custom: '⭐',
-}
+import { WorkoutSession, ACTIVITY_COLORS, ACTIVITY_LABELS, TRAINING_ZONE_SHORT, TRAINING_ZONE_COLORS } from '../../types'
+import ActivityIcon from '../ui/ActivityIcon'
 const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 function getWeekDates(offset: number): string[] {
@@ -132,7 +128,7 @@ export default function WeekCalendar({ sessions, onPlanDay, onCompleteSession, o
                         }
                       >
                         <div className="flex items-center gap-1">
-                          <span className="text-xs">{ACTIVITY_ICONS[session.activity]}</span>
+                          <ActivityIcon activity={session.activity} size={12} />
                           {session.status === 'completed' && (
                             <Check size={10} className="shrink-0" />
                           )}
@@ -140,8 +136,13 @@ export default function WeekCalendar({ sessions, onPlanDay, onCompleteSession, o
                         <p className="text-[11px] font-medium leading-tight mt-0.5 truncate">
                           {session.duration}m
                         </p>
-                        {isPlanned && (
-                          <p className="text-[10px] opacity-70 leading-tight">planned</p>
+                        {session.trainingZone && (
+                          <p
+                            className="text-[9px] font-bold uppercase tracking-wide leading-tight"
+                            style={{ color: TRAINING_ZONE_COLORS[session.trainingZone] }}
+                          >
+                            {TRAINING_ZONE_SHORT[session.trainingZone]}
+                          </p>
                         )}
                       </button>
                     )

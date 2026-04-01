@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { Sparkles, ChevronRight, ChevronLeft, Check, Loader2, Bot } from 'lucide-react'
 import { generateTrainingPlan } from '../lib/ai'
 import { usePlansStore } from '../store/plansStore'
-import { AIPlanParams, ActivityType, FitnessLevel, TrainingPlan, ACTIVITY_LABELS, ACTIVITY_COLORS } from '../types'
-import { IntensityBadge } from '../components/ui/Badge'
+import { AIPlanParams, ActivityType, FitnessLevel, TrainingPlan, ACTIVITY_LABELS, ACTIVITY_COLORS, TRAINING_ZONE_COLORS, TRAINING_ZONE_SHORT } from '../types'
+import { IntensityBadge, TrainingZoneBadge } from '../components/ui/Badge'
+import ActivityIcon from '../components/ui/ActivityIcon'
 
 const GOALS = [
   { id: 'general_fitness', label: 'General Fitness', desc: 'Stay active, build healthy habits', emoji: '🌟' },
@@ -20,11 +21,6 @@ const FITNESS_LEVELS: { id: FitnessLevel; label: string; desc: string }[] = [
 ]
 
 const ACTIVITIES: ActivityType[] = ['running', 'cycling', 'rowing', 'swimming', 'elliptical', 'hiit', 'walking']
-
-const ACTIVITY_ICONS: Record<ActivityType, string> = {
-  running: '🏃', cycling: '🚴', rowing: '🚣', swimming: '🏊',
-  elliptical: '⚡', hiit: '🔥', walking: '🚶', custom: '⭐',
-}
 
 function StepDots({ total, current }: { total: number; current: number }) {
   return (
@@ -145,7 +141,10 @@ export default function AIPlan() {
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
                     <span className="text-slate-200 text-sm flex-1 capitalize">{ACTIVITY_LABELS[s.activity]}</span>
                     <span className="text-slate-400 text-xs">{s.targetDuration}m</span>
-                    <IntensityBadge intensity={s.intensity} />
+                    {s.trainingZone
+                      ? <TrainingZoneBadge zone={s.trainingZone} />
+                      : <IntensityBadge intensity={s.intensity} />
+                    }
                   </div>
                 )
               })}
@@ -258,7 +257,7 @@ export default function AIPlan() {
                   className={`flex flex-col items-center gap-1 p-3 rounded-xl border text-xs font-medium transition-all ${selected ? '' : 'border-slate-700 text-slate-400 hover:border-slate-600'}`}
                   style={selected ? { borderColor: color, backgroundColor: `${color}15`, color } : {}}
                 >
-                  <span className="text-2xl">{ACTIVITY_ICONS[a]}</span>
+                  <ActivityIcon activity={a} size={20} />
                   {ACTIVITY_LABELS[a]}
                 </button>
               )

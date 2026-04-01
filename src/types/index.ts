@@ -11,6 +11,49 @@ export type ActivityType =
 export type IntensityLevel = 'easy' | 'moderate' | 'hard' | 'race'
 export type FitnessLevel = 'beginner' | 'intermediate' | 'advanced'
 
+export type TrainingZone =
+  | 'recovery'
+  | 'zone2'
+  | 'tempo'
+  | 'threshold'
+  | 'vo2max'
+  | 'hiit'
+  | 'long_run'
+  | 'compromised'
+
+export const TRAINING_ZONE_LABELS: Record<TrainingZone, string> = {
+  recovery:    'Recovery',
+  zone2:       'Zone 2',
+  tempo:       'Tempo',
+  threshold:   'Threshold',
+  vo2max:      'VO2 Max',
+  hiit:        'HIIT',
+  long_run:    'Long Run',
+  compromised: 'Compromised',
+}
+
+export const TRAINING_ZONE_SHORT: Record<TrainingZone, string> = {
+  recovery:    'Rec',
+  zone2:       'Z2',
+  tempo:       'Tempo',
+  threshold:   'Thr',
+  vo2max:      'VO2',
+  hiit:        'HIIT',
+  long_run:    'LR',
+  compromised: 'Comp',
+}
+
+export const TRAINING_ZONE_COLORS: Record<TrainingZone, string> = {
+  recovery:    '#6b7280',  // gray     — very easy / active recovery
+  zone2:       '#10b981',  // emerald  — aerobic base, fat burning
+  tempo:       '#f59e0b',  // amber    — comfortably hard / lactate threshold
+  threshold:   '#f97316',  // orange   — threshold work
+  vo2max:      '#ef4444',  // red      — VO2 max intervals
+  hiit:        '#dc2626',  // deep red — high intensity intervals
+  long_run:    '#3b82f6',  // blue     — long slow distance
+  compromised: '#8b5cf6',  // purple   — brick / compromised running
+}
+
 export interface WorkoutSession {
   id: string
   date: string // ISO date string YYYY-MM-DD
@@ -24,6 +67,7 @@ export interface WorkoutSession {
   notes?: string
   customName?: string
   status: 'planned' | 'completed'
+  trainingZone?: TrainingZone
 }
 
 export interface PlannedSession {
@@ -34,6 +78,7 @@ export interface PlannedSession {
   targetDistance?: number
   intensity: IntensityLevel
   description: string
+  trainingZone?: TrainingZone
 }
 
 export interface TrainingPlan {
