@@ -1,12 +1,13 @@
+import { useState } from 'react'
 import { Clock, Flame, TrendingUp, Zap } from 'lucide-react'
 import StatCard from '../components/ui/StatCard'
-import VolumeAreaChart from '../components/charts/VolumeAreaChart'
-import WeeklyBarChart from '../components/charts/WeeklyBarChart'
+import WeekCalendar from '../components/dashboard/WeekCalendar'
+import PlanSessionModal from '../components/logging/PlanSessionModal'
+import CompleteSessionModal from '../components/logging/CompleteSessionModal'
+import LogSessionModal from '../components/logging/LogSessionModal'
 import ActivityDonut from '../components/charts/ActivityDonut'
-import HeatmapCalendar from '../components/charts/HeatmapCalendar'
 import { useSessionsStore } from '../store/sessionsStore'
 import { useSettingsStore } from '../store/settingsStore'
-import { usePlansStore } from '../store/plansStore'
 import {
   getTodayVolume,
   getWeeklyVolume,
@@ -14,35 +15,33 @@ import {
   getCurrentStreak,
   formatDuration,
 } from '../lib/metrics'
-import { ACTIVITY_LABELS } from '../types'
+import { WorkoutSession } from '../types'
 
 export default function Dashboard() {
   const sessions = useSessionsStore(s => s.sessions)
   const settings = useSettingsStore(s => s.settings)
-  const activePlan = usePlansStore(s => s.plans.find(p => p.isActive))
 
-  const todayVol = getTodayVolume(sessions)
-  const weekVol = getWeeklyVolume(sessions)
-  const monthVol = getMonthlyVolume(sessions)
-  const streak = getCurrentStreak(sessions)
-  const weekPct = settings.weeklyVolumeGoal > 0 ? Math.round((weekVol / settings.weeklyVolumeGoal) * 100) : 0
+  // Only count completed sessions for stats
+  const completed = sessions.filter(s => s.status === 'completed')
 
-  // Month-over-month trend
-  const lastMonthStart = (() => {
-    const d = new Date(); d.setMonth(d.getMonth() - 1)
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
-  })()
+  const todayVol = getTodayVolume(completed)
+  const weekVol = getWeeklyVolume(completed)
+  const monthVol = getMonthlyVolume(completed)
+  const streak = getCurrentStreak(completed)
+  const weekPct = settings.weeklyVolumeGoal > 0
+    ? Math.round((weekVol / settings.weeklyVolumeGoal) * 100)
+    : 0
+
   const thisMonthStart = (() => {
     const d = new Date()
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
   })()
-  const lastMonthVol = sessions
-    .filter(s => s.date >= lastMonthStart && s.date < thisMonthStart)
-    .reduce((sum, s) => sum + s.duration, 0)
-  const trend = lastMonthVol > 0 ? Math.round(((monthVol - lastMonthVol) / lastMonthVol) * 100) : 0
+  const thisMonthCompleted = completed.filter(s => s.date >= thisMonthStart)
 
-  // This month sessions
-  const thisMonthSessions = sessions.filter(s => s.date >= thisMonthStart)
+  // Modal state
+  const [planDate, setPlanDate] = useState<string | null>(null)
+  const [completeSession, setCompleteSession] = useState<WorkoutSession | null>(null)
+  const [viewSession, setViewSession] = useState<WorkoutSession | null>(null)
 
   return (
     <div className="space-y-6">
@@ -65,10 +64,9 @@ export default function Dashboard() {
         <StatCard
           label="This Month"
           value={formatDuration(monthVol)}
-          subtext={`${thisMonthSessions.length} sessions`}
+          subtext={`${thisMonthCompleted.length} sessions`}
           icon={Flame}
           color="orange"
-          trend={trend}
         />
         <StatCard
           label="Streak"
@@ -79,11 +77,13 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Weekly goal progress bar */}
+      {/* Weekly goal progress */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-slate-300 text-sm font-medium">Weekly Goal Progress</span>
-          <span className="text-slate-400 text-sm">{formatDuration(weekVol)} / {formatDuration(settings.weeklyVolumeGoal)}</span>
+          <span className="text-slate-300 text-sm font-medium">Weekly Goal</span>
+          <span className="text-slate-400 text-sm">
+            {formatDuration(weekVol)} / {formatDuration(settings.weeklyVolumeGoal)}
+          </span>
         </div>
         <div className="h-2.5 bg-slate-800 rounded-full overflow-hidden">
           <div
@@ -94,69 +94,42 @@ export default function Dashboard() {
             }}
           />
         </div>
+        {settings.raceDate && (
+          <p className="text-xs text-slate-500 mt-2">
+            {settings.raceType ? `🏁 ${settings.raceType}` : '🏁 Race'} —{' '}
+            {new Date(settings.raceDate + 'T12:00:00').toLocaleDateString('en', {
+              month: 'long', day: 'numeric', year: 'numeric',
+            })}
+          </p>
+        )}
       </div>
 
-      {/* Main area chart */}
-      <VolumeAreaChart sessions={sessions} days={30} />
+      {/* Weekly calendar */}
+      <WeekCalendar
+        sessions={sessions}
+        onPlanDay={date => setPlanDate(date)}
+        onCompleteSession={s => setCompleteSession(s)}
+        onViewSession={s => setViewSession(s)}
+      />
 
-      {/* Row 2: Weekly bar + Donut */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <WeeklyBarChart sessions={sessions} weeks={12} />
-        </div>
-        <ActivityDonut sessions={thisMonthSessions} />
-      </div>
+      {/* Activity mix this month */}
+      {thisMonthCompleted.length > 0 && (
+        <ActivityDonut sessions={thisMonthCompleted} />
+      )}
 
-      {/* Row 3: Heatmap + Active plan */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <HeatmapCalendar sessions={sessions} />
-        </div>
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-          <h3 className="text-white font-semibold mb-1">Active Plan</h3>
-          {activePlan ? (
-            <div>
-              <p className="text-blue-400 font-medium text-sm">{activePlan.name}</p>
-              <p className="text-slate-400 text-xs mt-1">{activePlan.description}</p>
-              <div className="mt-3 space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-400">Duration</span>
-                  <span className="text-slate-300">{activePlan.durationWeeks} weeks</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-400">Sessions/week</span>
-                  <span className="text-slate-300">
-                    {Math.round(activePlan.sessions.filter(s => s.weekNumber === 1).length)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-400">Goal</span>
-                  <span className="text-slate-300 capitalize">{activePlan.goal.replace('_', ' ')}</span>
-                </div>
-              </div>
-              {activePlan.sessions.length > 0 && (
-                <div className="mt-3">
-                  <p className="text-slate-500 text-xs mb-2">Week 1 Preview</p>
-                  <div className="space-y-1">
-                    {activePlan.sessions.filter(s => s.weekNumber === 1).slice(0, 3).map((s, i) => (
-                      <div key={i} className="flex items-center gap-2 text-xs">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                        <span className="text-slate-300 capitalize">{ACTIVITY_LABELS[s.activity]}</span>
-                        <span className="text-slate-500">{s.targetDuration}m</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-32 text-center">
-              <p className="text-slate-500 text-sm">No active plan</p>
-              <p className="text-slate-600 text-xs mt-1">Create or activate a plan in Plans</p>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Modals */}
+      {planDate && (
+        <PlanSessionModal date={planDate} onClose={() => setPlanDate(null)} />
+      )}
+      {completeSession && (
+        <CompleteSessionModal
+          session={completeSession}
+          onClose={() => setCompleteSession(null)}
+        />
+      )}
+      {viewSession && (
+        <LogSessionModal onClose={() => setViewSession(null)} />
+      )}
     </div>
   )
 }

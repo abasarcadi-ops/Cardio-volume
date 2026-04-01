@@ -68,6 +68,7 @@ export function generateSeedData(): WorkoutSession[] {
       avgHeartRate: 120 + Math.floor(Math.random() * 50),
       perceivedEffort: effort,
       notes: '',
+      status: 'completed',
     })
   }
 

@@ -15,7 +15,7 @@ export interface WorkoutSession {
   id: string
   date: string // ISO date string YYYY-MM-DD
   activity: ActivityType
-  duration: number // minutes
+  duration: number // minutes (target if planned, actual if completed)
   distance?: number // km
   calories?: number
   avgHeartRate?: number
@@ -23,6 +23,7 @@ export interface WorkoutSession {
   perceivedEffort: 1 | 2 | 3 | 4 | 5
   notes?: string
   customName?: string
+  status: 'planned' | 'completed'
 }
 
 export interface PlannedSession {
@@ -49,11 +50,19 @@ export interface TrainingPlan {
 }
 
 export interface UserSettings {
+  name: string
   weeklyVolumeGoal: number // minutes
   preferredActivities: ActivityType[]
   fitnessLevel: FitnessLevel
   goal: string
-  name: string
+  // Onboarding fields
+  age?: number
+  weightKg?: number
+  heightCm?: number
+  raceType?: string   // e.g. '5K', '10K', 'half-marathon', 'marathon', 'triathlon'
+  raceDate?: string   // ISO date YYYY-MM-DD
+  injuries?: string
+  onboardingComplete: boolean
 }
 
 export interface AIPlanParams {

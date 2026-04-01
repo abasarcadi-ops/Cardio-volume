@@ -12,11 +12,12 @@ interface SettingsState {
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
+  name: 'Athlete',
   weeklyVolumeGoal: 300,
   preferredActivities: ['running', 'cycling'],
   fitnessLevel: 'intermediate',
   goal: 'General fitness and endurance',
-  name: 'Athlete',
+  onboardingComplete: false,
 }
 
 export const useSettingsStore = create<SettingsState>()((set, get) => ({

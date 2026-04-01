@@ -1,8 +1,10 @@
 import { HashRouter, Routes, Route } from 'react-router-dom'
 import { isConfigured } from './lib/supabase'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { useSettingsStore } from './store/settingsStore'
 import SetupPage from './pages/SetupPage'
 import AuthPage from './pages/AuthPage'
+import OnboardingPage from './pages/OnboardingPage'
 import Layout from './components/layout/Layout'
 import Dashboard from './pages/Dashboard'
 import Log from './pages/Log'
@@ -12,9 +14,11 @@ import AIPlan from './pages/AIPlan'
 import { useState } from 'react'
 
 function AppRoutes() {
-  const { user, loading } = useAuth()
+  const { user, loading: authLoading } = useAuth()
+  const settings = useSettingsStore(s => s.settings)
+  const settingsLoading = useSettingsStore(s => s.loading)
 
-  if (loading) {
+  if (authLoading || (user && settingsLoading)) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
@@ -23,6 +27,7 @@ function AppRoutes() {
   }
 
   if (!user) return <AuthPage />
+  if (!settings.onboardingComplete) return <OnboardingPage />
 
   return (
     <HashRouter>

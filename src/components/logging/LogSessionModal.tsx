@@ -46,6 +46,7 @@ export default function LogSessionModal({ onClose }: Props) {
       perceivedEffort: effort,
       notes: notes || undefined,
       customName: customName || undefined,
+      status: 'completed',
     })
     onClose()
   }

@@ -16,6 +16,7 @@ function rowToSession(row: Record<string, unknown>): WorkoutSession {
     perceivedEffort: row.perceived_effort as WorkoutSession['perceivedEffort'],
     notes: row.notes as string | undefined,
     customName: row.custom_name as string | undefined,
+    status: (row.status as 'planned' | 'completed') ?? 'completed',
   }
 }
 
@@ -48,6 +49,7 @@ export async function insertSession(
     perceived_effort: session.perceivedEffort,
     notes: session.notes ?? null,
     custom_name: session.customName ?? null,
+    status: session.status,
   })
   if (error) throw error
   return id
@@ -69,6 +71,7 @@ export async function updateSessionDB(
   if (updates.perceivedEffort !== undefined) row.perceived_effort = updates.perceivedEffort
   if (updates.notes !== undefined) row.notes = updates.notes
   if (updates.customName !== undefined) row.custom_name = updates.customName
+  if (updates.status !== undefined) row.status = updates.status
   const { error } = await sb.from('workout_sessions').update(row).eq('id', id)
   if (error) throw error
 }
@@ -162,11 +165,18 @@ export async function fetchSettings(
   if (error && error.code !== 'PGRST116') throw error // PGRST116 = no rows found
   if (!data) return null
   return {
+    name: data.name,
     weeklyVolumeGoal: data.weekly_volume_goal,
     preferredActivities: data.preferred_activities,
     fitnessLevel: data.fitness_level,
     goal: data.goal,
-    name: data.name,
+    age: data.age ?? undefined,
+    weightKg: data.weight_kg ?? undefined,
+    heightCm: data.height_cm ?? undefined,
+    raceType: data.race_type ?? undefined,
+    raceDate: data.race_date ?? undefined,
+    injuries: data.injuries ?? undefined,
+    onboardingComplete: data.onboarding_complete ?? false,
   }
 }
 
@@ -177,11 +187,18 @@ export async function upsertSettings(
 ): Promise<void> {
   const { error } = await sb.from('user_settings').upsert({
     user_id: userId,
+    name: settings.name,
     weekly_volume_goal: settings.weeklyVolumeGoal,
     preferred_activities: settings.preferredActivities,
     fitness_level: settings.fitnessLevel,
     goal: settings.goal,
-    name: settings.name,
+    age: settings.age ?? null,
+    weight_kg: settings.weightKg ?? null,
+    height_cm: settings.heightCm ?? null,
+    race_type: settings.raceType ?? null,
+    race_date: settings.raceDate ?? null,
+    injuries: settings.injuries ?? null,
+    onboarding_complete: settings.onboardingComplete,
     updated_at: new Date().toISOString(),
   })
   if (error) throw error
